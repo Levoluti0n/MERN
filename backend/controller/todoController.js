@@ -1,38 +1,60 @@
+const asyncHandler = require("express-async-handler");
+const Todo = require('../model/todoModel');
+
 // @desc Get todos
 // @route /todos
 // @access Private
  
-const getTodos = (req, res) => {
-    res.status(200).json({message: 'get Todos'});
-}
+const getTodos = asyncHandler(async (req, res) => {
+    const todos = await Todo.find();
+    res.status(200).json(todos);
+})
 
 // @desc Set todo
 // @route /todos
 // @access Private
 
-const setTodo = (req, res) => {
+const setTodo = asyncHandler(async (req, res) => {
     if(!req.body.text){
         res.status(400);
         throw new Error('Please add a text field');
     }
-    res.status(200).json({message: 'set Todo'})
-}
+    const todo = await Todo.create({
+        text: req.body.text
+    })
+    
+    res.status(200).json(todo);
+})
 
 // @desc Update todo
 // @route /todos:id
 // @access Private
  
-const updateTodo = (req, res) => {
-    res.status(200).json({message: `update Todo ${req.params.id}`})
-}
+const updateTodo = asyncHandler(async (req, res) => {
+    const todo = await Todo.findById(req.params.id);
+
+    if(!todo) {
+        res.status(400);
+        throw new Error('Todo not found!');
+    }
+    const updatedTodo = await Todo.findByIdAndUpdate(req.params.id, req.body, {new: true})
+    res.status(200).json(updatedTodo);
+})
 
 // @desc Update todo
 // @route /todos:id
 // @access Private
  
-const deleteTodo = (req, res) => {
-    res.status(200).json({message: `delete Todo ${req.params.id}`})
-}
+const deleteTodo = asyncHandler(async (req, res) => {
+    const todo = await Todo.findById(req.params.id);
+
+    if(!todo) {
+        res.status(400);
+        throw new Error('Todo not found!');
+    }
+    todo.remove();
+    res.status(200).json({message: req.params.id})
+})
 
 module.exports = {
     setTodo,

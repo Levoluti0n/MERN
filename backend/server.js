@@ -4,7 +4,10 @@ const express = require('express');
 
 const errorHandler = require('./middleware/errorMiddleware');
 const router = require('./routes/todoRoutes');
+const connectDB = require('./config/db');
 const app = express();
+
+connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
